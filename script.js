@@ -1,35 +1,34 @@
 const jugadoresDefault = [
-    { nombre: "Jean", puntos: 0 },
-    { nombre: "Josué", puntos: 0 },
-    { nombre: "Ana", puntos: 0 },
-    { nombre: "Adri", puntos: 0 },
-    { nombre: "Enne", puntos: 0 },
-    { nombre: "Álvaro", puntos: 0 },
-    { nombre: "Henry", puntos: 0 }
-  ];
+  { nombre: "Jean", puntos: 0 },
+  { nombre: "Josué", puntos: 0 },
+  { nombre: "Ana", puntos: 0 },
+  { nombre: "Adri", puntos: 0 },
+  { nombre: "Enne", puntos: 0 },
+  { nombre: "Álvaro", puntos: 0 },
+  { nombre: "Henry", puntos: 0 }
+];
 
-  let jugadores = [];
+let jugadores = [];
+let isAdmin = false;
 
-// Revisar localStorage
+// SOLO UNA VERIFICACIÓN al inicio
 if(localStorage.getItem("jugadores")){
-  let guardados = JSON.parse(localStorage.getItem("jugadores"));
+let guardados = JSON.parse(localStorage.getItem("jugadores"));
 
-  // Verificar si los nombres cambiaron
-  let mismosNombres = guardados.length === jugadoresDefault.length &&
-    guardados.every((j, i) => j.nombre === jugadoresDefault[i].nombre);
+// Verificar si los nombres cambiaron
+let mismosNombres = guardados.length === jugadoresDefault.length &&
+  guardados.every((j, i) => j.nombre === jugadoresDefault[i].nombre);
 
-  if(mismosNombres){
-    jugadores = guardados; // usar datos guardados
-  } else {
-    jugadores = [...jugadoresDefault]; // sobrescribir si los nombres cambiaron
-    guardarDatos();
-  }
+if(mismosNombres){
+  jugadores = guardados; // usar datos guardados
 } else {
-  jugadores = [...jugadoresDefault]; // primera vez
+  jugadores = [...jugadoresDefault]; // sobrescribir si los nombres cambiaron
   guardarDatos();
 }
-
-let isAdmin = false;
+} else {
+jugadores = [...jugadoresDefault]; // primera vez
+guardarDatos();
+}
 
 renderRanking();
   
@@ -98,9 +97,10 @@ renderRanking();
   }
   
   // Guardar en localStorage
-  function guardarDatos(){
-    localStorage.setItem("jugadores", JSON.stringify(jugadores));
-  }
+function guardarDatos(){
+  localStorage.setItem("jugadores", JSON.stringify(jugadores));
+  console.log("Datos guardados:", jugadores); // Para debug
+}
   
   // Reiniciar mes
   function reiniciarMes(){
