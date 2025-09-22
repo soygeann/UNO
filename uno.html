@@ -1,1 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ranking UNO</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Header con logo y login -->
+  <header>
+    <img src="assets/logo.png" alt="UNO Logo" class="logo">
+    <button id="login-btn" class="login-icon" onclick="mostrarLogin()">🔑</button>
+  </header>
 
+  <!-- Login modal -->
+  <div id="login-container" class="modal hidden">
+    <div class="modal-content">
+      <span class="close" onclick="cerrarLogin()">&times;</span>
+      <h2>Acceso Admin</h2>
+      <input type="text" id="username" placeholder="Usuario">
+      <input type="password" id="password" placeholder="Contraseña">
+      <button onclick="login()">Entrar</button>
+      <p id="login-error" class="error"></p>
+    </div>
+  </div>
+
+  <!-- Ranking -->
+  <div id="ranking-container">
+    <!-- <h1> <img src="assets/tittle.png" alt="UNO Logo" class="tittle"></h1> -->
+    <h1 class="ranking-title">Ranking</h1> 
+    <div id="ranking-body" class="ranking-list">
+      <!-- Jugadores aquí -->
+    </div>
+
+    <div class="admin-panel admin-only hidden">
+      <button onclick="reiniciarMes()">Reiniciar Mes</button>
+    </div>
+
+    <p class="frase">Porque la amistad no se rompe... <br> solo se dobla con +4.</p>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
