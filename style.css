@@ -178,3 +178,38 @@ body {
     color: #ffe600;
     text-shadow: -3px 3px 0px #000;
   }
+
+  /* 🔹 Estilos para los botones de sumar/restar */
+.btn-sumar {
+  padding: 5px 8px;
+  border: none;
+  border-radius: 6px;
+  background: #28a745; /* Verde para sumar */
+  color: white;
+  cursor: pointer;
+  margin: 0 2px;
+}
+
+.btn-restar {
+  padding: 5px 8px;
+  border: none;
+  border-radius: 6px;
+  background: #dc3545; /* Rojo para restar */
+  color: white;
+  cursor: pointer;
+  margin: 0 2px;
+}
+
+.btn-sumar:hover {
+  background: #218838;
+}
+
+.btn-restar:hover {
+  background: #c82333;
+}
+
+/* 🔹 Ajustar el espacio de los botones */
+.ranking-card .admin-only {
+  display: flex;
+  gap: 5px;
+}
