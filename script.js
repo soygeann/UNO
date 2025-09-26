@@ -2,7 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
 import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 
-// 🔥 Configuración de Firebase
+// Configuración de Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyBeMePGMGkhtlHmukEcEea59gF4_yFneXI",
   authDomain: "unno-e8408.firebaseapp.com",
@@ -37,9 +37,10 @@ let isAdmin = false;
 onSnapshot(doc(db, "ranking", "jugadores"), (docSnap) => {
   if (docSnap.exists()) {
     jugadores = docSnap.data().lista;
+    console.log("🔥 Jugadores cargados:", jugadores);
     renderRanking();
   } else {
-    // Si no existe, lo creamos con los valores por defecto
+    console.warn("No existe el doc jugadores, creando por defecto...");
     guardarDatos(jugadoresDefault);
   }
 });
@@ -51,44 +52,31 @@ async function guardarDatos(lista) {
   await setDoc(doc(db, "ranking", "jugadores"), { lista });
 }
 
-// ==========================
 // 🔹 Sumar puntos
-// ==========================
 async function sumarPuntos(i) {
   if (!isAdmin) return;
-  jugadores[i].puntos += 3;
+  jugadores[i].puntos += 0;
   await guardarDatos(jugadores);
+
+  // 🔥 Mensaje para WhatsApp
+  const texto = `🔥 ${jugadores[i].nombre} acaba de sumar 0 puntos en el ranking de UNO! ¿Quién lo detiene?`;
+
+  // Abre WhatsApp con el mensaje listo
+  window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, "_blank");
 }
 
-// ==========================
+
 // 🔹 Reiniciar mes
-// ==========================
 async function reiniciarMes() {
   if (!isAdmin) return;
-
   let confirmar = confirm("¿Seguro que quieres reiniciar el mes?");
   if (confirmar) {
-    // Guardar historial
-    const historialRef = doc(db, "ranking", "historial");
-    let snap = await getDoc(historialRef);
-    let historial = snap.exists() ? snap.data().meses : [];
-
-    historial.push({
-      fecha: new Date().toLocaleDateString(),
-      datos: jugadores
-    });
-
-    await setDoc(historialRef, { meses: historial });
-
-    // Reiniciar puntos
     jugadores.forEach(j => j.puntos = 0);
     await guardarDatos(jugadores);
   }
 }
 
-// ==========================
 // 🔹 Login
-// ==========================
 function login() {
   const user = document.getElementById("username").value;
   const pass = document.getElementById("password").value;
@@ -104,10 +92,13 @@ function login() {
   }
 }
 
-// ==========================
 // 🔹 Render ranking
-// ==========================
 function renderRanking() {
+  if (!jugadores || jugadores.length === 0) {
+    console.warn("⚠️ No hay jugadores para mostrar todavía");
+    return;
+  }
+
   jugadores.sort((a, b) => b.puntos - a.puntos);
   let body = document.getElementById("ranking-body");
   body.innerHTML = "";
@@ -129,9 +120,7 @@ function renderRanking() {
   });
 }
 
-// ==========================
 // 🔹 Modal
-// ==========================
 function mostrarLogin() {
   document.getElementById("login-container").classList.remove("hidden");
 }
@@ -139,9 +128,7 @@ function cerrarLogin() {
   document.getElementById("login-container").classList.add("hidden");
 }
 
-// ==========================
 // 🔹 Exponer funciones al DOM
-// ==========================
 window.sumarPuntos = sumarPuntos;
 window.reiniciarMes = reiniciarMes;
 window.login = login;
