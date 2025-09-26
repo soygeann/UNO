@@ -48,21 +48,22 @@ body {
   .ranking-card {
     background: rgba(255,255,255,0.9);
     color: black;
-    width: 80%;
-    max-width: 320px;
+    width: 90%;
+    max-width: 400px;  /* ✅ Aumentar el ancho */
     border-radius: 12px;
-    padding: 10px;
+    padding: 12px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     font-weight: bold;
     box-shadow: 0 4px 8px rgba(0,0,0,0.4);
-  }
-  
-  .ranking-card span {
+}
+
+.ranking-card span {
     flex: 1;
     text-align: center;
-  }
+    font-size: 14px;
+}
   
   .ranking-card button {
     padding: 5px 8px;
@@ -184,20 +185,30 @@ body {
   padding: 5px 8px;
   border: none;
   border-radius: 6px;
-  background: #28a745; /* Verde para sumar */
-  color: white;
+  color: rgb(96, 255, 64);
   cursor: pointer;
   margin: 0 2px;
+  font-size: 12px;
+  flex: 1;
 }
 
 .btn-restar {
   padding: 5px 8px;
   border: none;
   border-radius: 6px;
-  background: #dc3545; /* Rojo para restar */
-  color: white;
+  color: rgb(255, 76, 76);
   cursor: pointer;
   margin: 0 2px;
+  font-size: 12px;
+  flex: 1;
+}
+
+.btn-sumar {
+  background: #28a745;
+}
+
+.btn-restar {
+  background: #dc3545;
 }
 
 .btn-sumar:hover {
@@ -208,8 +219,15 @@ body {
   background: #c82333;
 }
 
-/* 🔹 Ajustar el espacio de los botones */
+/* 🔹 Ajustar botones */
 .ranking-card .admin-only {
   display: flex;
   gap: 5px;
+  flex: 1.5; /* Un poco más de espacio para los botones */
+}
+
+/* 🔹 Estilo especial para victorias */
+.ranking-card span:nth-child(4) {
+  color: #ffd700; /* Dorado para las victorias */
+  font-weight: bold;
 }
