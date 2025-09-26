@@ -17,7 +17,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Datos iniciales (ACTUALIZADOS)
+// Datos iniciales
 const jugadoresDefault = [
   { nombre: "Jean", puntos: 0, victorias: 0 },
   { nombre: "Josué", puntos: 0, victorias: 0 },
@@ -38,10 +38,13 @@ onSnapshot(doc(db, "ranking", "jugadores"), (docSnap) => {
   if (docSnap.exists()) {
     jugadores = docSnap.data().lista;
     
-    // ✅ CORREGIR: Asegurar que todos tengan el campo 'victorias'
+    // ✅ CORRECCIÓN CRÍTICA: Inicializar victorias si no existen
     jugadores.forEach(jugador => {
-      if (jugador.victorias === undefined) {
-        jugador.victorias = 0; // Inicializar si no existe
+      if (jugador.victorias === undefined || isNaN(jugador.victorias)) {
+        jugador.victorias = 0;
+      }
+      if (jugador.puntos === undefined || isNaN(jugador.puntos)) {
+        jugador.puntos = 0;
       }
     });
     
@@ -64,7 +67,7 @@ async function guardarDatos(lista) {
 async function sumarPuntos(i) {
   if (!isAdmin) return;
   
-  // ✅ Asegurar que los valores sean números
+  // ✅ Validación extra por seguridad
   if (isNaN(jugadores[i].puntos)) jugadores[i].puntos = 0;
   if (isNaN(jugadores[i].victorias)) jugadores[i].victorias = 0;
   
@@ -79,7 +82,7 @@ async function sumarPuntos(i) {
 async function restarPuntos(i) {
   if (!isAdmin) return;
   
-  // ✅ Asegurar que los valores sean números
+  // ✅ Validación extra por seguridad
   if (isNaN(jugadores[i].puntos)) jugadores[i].puntos = 0;
   if (isNaN(jugadores[i].victorias)) jugadores[i].victorias = 0;
   
@@ -90,35 +93,14 @@ async function restarPuntos(i) {
   renderRanking();
 }
 
-// 🔹 Función para corregir datos existentes (OPCIONAL)
-async function corregirDatos() {
-  jugadores.forEach(jugador => {
-    if (jugador.victorias === undefined || isNaN(jugador.victorias)) {
-      jugador.victorias = 0;
-    }
-    if (jugador.puntos === undefined || isNaN(jugador.puntos)) {
-      jugador.puntos = 0;
-    }
-  });
-  
-  await guardarDatos(jugadores);
-  renderRanking();
-  console.log('✅ Datos corregidos');
-}
-
-// Ejecutar al cargar si es admin
-if (isAdmin) {
-  corregirDatos();
-}
-
-// 🔹 Reiniciar mes (ACTUALIZADA)
+// 🔹 Reiniciar mes
 async function reiniciarMes() {
   if (!isAdmin) return;
   let confirmar = confirm("¿Seguro que quieres reiniciar el mes?");
   if (confirmar) {
     jugadores.forEach(j => {
       j.puntos = 0;
-      j.victorias = 0;  // ✅ Reiniciar victorias también
+      j.victorias = 0;
     });
     await guardarDatos(jugadores);
   }
@@ -140,7 +122,7 @@ function login() {
   }
 }
 
-// 🔹 Render ranking (ACTUALIZADA)
+// 🔹 Render ranking (CORREGIDA para mostrar 0 si hay NaN)
 function renderRanking() {
   if (!jugadores || jugadores.length === 0) {
     console.warn("⚠️ No hay jugadores para mostrar todavía");
@@ -155,11 +137,15 @@ function renderRanking() {
     let card = document.createElement("div");
     card.classList.add("ranking-card");
 
+    // ✅ Mostrar 0 si es NaN/undefined
+    const puntos = isNaN(j.puntos) ? 0 : j.puntos;
+    const victorias = isNaN(j.victorias) ? 0 : j.victorias;
+
     card.innerHTML = `
       <span>${index + 1}</span>
       <span>${j.nombre}</span>
-      <span>${j.puntos} pts</span>
-      <span>${j.victorias} 🏆</span>
+      <span>${puntos} pts</span>
+      <span>${victorias} 🏆</span>
       ${isAdmin ? `
         <span class="admin-only">
           <button onclick="sumarPuntos(${index})" class="btn-sumar">+3</button>
