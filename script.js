@@ -55,7 +55,7 @@ async function guardarDatos(lista) {
 // 🔹 Sumar puntos
 async function sumarPuntos(i) {
   if (!isAdmin) return;
-  jugadores[i].puntos += 0;
+  jugadores[i].puntos += 3;
   await guardarDatos(jugadores);
 }
 
@@ -148,4 +148,5 @@ window.reiniciarMes = reiniciarMes;
 window.login = login;
 window.mostrarLogin = mostrarLogin;
 window.cerrarLogin = cerrarLogin;
+
 
