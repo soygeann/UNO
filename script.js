@@ -65,6 +65,26 @@ async function sumarPuntos(i) {
   window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, "_blank");
 }
 
+// 🔹 Restar puntos (NUEVA FUNCIÓN)
+async function restarPuntos(i) {
+  if (!isAdmin) return;
+  
+  const jugadorNombre = jugadores[i].nombre;
+  jugadores[i].puntos -= 3;
+  
+  // Asegurar que no queden puntos negativos
+  if (jugadores[i].puntos < 0) {
+    jugadores[i].puntos = 0;
+  }
+  
+  await guardarDatos(jugadores);
+  
+  // 🔥 Opcional: Notificación de resta
+  if (typeof enviarNotificacionWhatsApp === 'function') {
+    enviarNotificacionWhatsApp(jugadorNombre, -3);
+  }
+}
+
 
 // 🔹 Reiniciar mes
 async function reiniciarMes() {
@@ -92,7 +112,7 @@ function login() {
   }
 }
 
-// 🔹 Render ranking
+// 🔹 Render ranking (FUNCIÓN MODIFICADA)
 function renderRanking() {
   if (!jugadores || jugadores.length === 0) {
     console.warn("⚠️ No hay jugadores para mostrar todavía");
@@ -112,7 +132,8 @@ function renderRanking() {
       <span>${j.nombre}</span>
       <span>${j.puntos}</span>
       <span class="admin-only ${isAdmin ? "" : "hidden"}">
-        <button onclick="sumarPuntos(${index})">+3</button>
+        <button onclick="sumarPuntos(${index})" class="btn-sumar">+3</button>
+        <button onclick="restarPuntos(${index})" class="btn-restar">-3</button>
       </span>
     `;
 
@@ -128,8 +149,9 @@ function cerrarLogin() {
   document.getElementById("login-container").classList.add("hidden");
 }
 
-// 🔹 Exponer funciones al DOM
+// 🔹 Exponer funciones al DOM (ACTUALIZADO)
 window.sumarPuntos = sumarPuntos;
+window.restarPuntos = restarPuntos; // ← NUEVA
 window.reiniciarMes = reiniciarMes;
 window.login = login;
 window.mostrarLogin = mostrarLogin;
