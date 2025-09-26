@@ -228,7 +228,6 @@ body {
 
 /* 🔹 Estilo especial para victorias */
 .ranking-card span:nth-child(4) {
-  color: #dc3545; /* rojo para las victorias */
+  color: #c21c1c; /* Dorado para las victorias */
   font-weight: bold;
 }
-
