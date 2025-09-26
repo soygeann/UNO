@@ -55,14 +55,8 @@ async function guardarDatos(lista) {
 // 🔹 Sumar puntos
 async function sumarPuntos(i) {
   if (!isAdmin) return;
-  jugadores[i].puntos += 3;
+  jugadores[i].puntos += 0;
   await guardarDatos(jugadores);
-
-  // 🔥 Mensaje para WhatsApp
-  const texto = `🔥 ${jugadores[i].nombre} acaba de sumar 0 puntos en el ranking de UNO! ¿Quién lo detiene?`;
-
-  // Abre WhatsApp con el mensaje listo
-  window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, "_blank");
 }
 
 // 🔹 Restar puntos (NUEVA FUNCIÓN)
@@ -78,11 +72,6 @@ async function restarPuntos(i) {
   }
   
   await guardarDatos(jugadores);
-  
-  // 🔥 Opcional: Notificación de resta
-  if (typeof enviarNotificacionWhatsApp === 'function') {
-    enviarNotificacionWhatsApp(jugadorNombre, -3);
-  }
 }
 
 
@@ -102,7 +91,7 @@ function login() {
   const pass = document.getElementById("password").value;
   const error = document.getElementById("login-error");
 
-  if (user === "admin" && pass === "1234") {
+  if (user === "admin" && pass === "2775") {
     isAdmin = true;
     cerrarLogin();
     document.querySelectorAll(".admin-only").forEach(el => el.classList.remove("hidden"));
@@ -112,7 +101,7 @@ function login() {
   }
 }
 
-// 🔹 Render ranking (FUNCIÓN MODIFICADA)
+// 🔹 Render ranking (VERSIÓN ALTERNATIVA)
 function renderRanking() {
   if (!jugadores || jugadores.length === 0) {
     console.warn("⚠️ No hay jugadores para mostrar todavía");
@@ -127,14 +116,21 @@ function renderRanking() {
     let card = document.createElement("div");
     card.classList.add("ranking-card");
 
+    let botonesHTML = '';
+    if (isAdmin) {
+      botonesHTML = `
+        <span class="admin-only">
+          <button onclick="sumarPuntos(${index})" class="btn-sumar">+3</button>
+          <button onclick="restarPuntos(${index})" class="btn-restar">-3</button>
+        </span>
+      `;
+    }
+
     card.innerHTML = `
       <span>${index + 1}</span>
       <span>${j.nombre}</span>
       <span>${j.puntos}</span>
-      <span class="admin-only ${isAdmin ? "" : "hidden"}">
-        <button onclick="sumarPuntos(${index})" class="btn-sumar">+3</button>
-        <button onclick="restarPuntos(${index})" class="btn-restar">-3</button>
-      </span>
+      ${botonesHTML}
     `;
 
     body.appendChild(card);
@@ -156,4 +152,3 @@ window.reiniciarMes = reiniciarMes;
 window.login = login;
 window.mostrarLogin = mostrarLogin;
 window.cerrarLogin = cerrarLogin;
-
