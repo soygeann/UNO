@@ -101,7 +101,7 @@ function login() {
   }
 }
 
-// 🔹 Render ranking (VERSIÓN ALTERNATIVA)
+// 🔹 Render ranking (VERSIÓN DEFINITIVA)
 function renderRanking() {
   if (!jugadores || jugadores.length === 0) {
     console.warn("⚠️ No hay jugadores para mostrar todavía");
@@ -116,21 +116,17 @@ function renderRanking() {
     let card = document.createElement("div");
     card.classList.add("ranking-card");
 
-    let botonesHTML = '';
-    if (isAdmin) {
-      botonesHTML = `
-        <span class="admin-only">
-          <button onclick="sumarPuntos(${index})" class="btn-sumar">+3</button>
-          <button onclick="restarPuntos(${index})" class="btn-restar">-3</button>
-        </span>
-      `;
-    }
-
+    // ✅ Los botones SOLO se muestran si isAdmin = true
     card.innerHTML = `
       <span>${index + 1}</span>
       <span>${j.nombre}</span>
       <span>${j.puntos}</span>
-      ${botonesHTML}
+      ${isAdmin ? `
+        <span class="admin-only">
+          <button onclick="sumarPuntos(${index})" class="btn-sumar">+3</button>
+          <button onclick="restarPuntos(${index})" class="btn-restar">-3</button>
+        </span>
+      ` : ''}
     `;
 
     body.appendChild(card);
@@ -152,3 +148,4 @@ window.reiniciarMes = reiniciarMes;
 window.login = login;
 window.mostrarLogin = mostrarLogin;
 window.cerrarLogin = cerrarLogin;
+
