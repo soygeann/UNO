@@ -17,15 +17,15 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Datos iniciales
+// Datos iniciales (MODIFICADOS)
 const jugadoresDefault = [
-  { nombre: "Jean", puntos: 0 },
-  { nombre: "Josué", puntos: 0 },
-  { nombre: "Ana", puntos: 0 },
-  { nombre: "Adri", puntos: 0 },
-  { nombre: "Enne", puntos: 0 },
-  { nombre: "Álvaro", puntos: 0 },
-  { nombre: "Henry", puntos: 0 }
+  { nombre: "Jean", puntos: 0, victorias: 0 },
+  { nombre: "Josué", puntos: 0, victorias: 0 },
+  { nombre: "Ana", puntos: 0, victorias: 0 },
+  { nombre: "Adri", puntos: 0, victorias: 0 },
+  { nombre: "Enne", puntos: 0, victorias: 0 },
+  { nombre: "Álvaro", puntos: 0, victorias: 0 },
+  { nombre: "Henry", puntos: 0, victorias: 0 }
 ];
 
 let jugadores = [];
@@ -52,39 +52,38 @@ async function guardarDatos(lista) {
   await setDoc(doc(db, "ranking", "jugadores"), { lista });
 }
 
-// 🔹 Sumar puntos (FUNCIÓN CORREGIDA)
+// 🔹 Sumar puntos (MODIFICADA para incluir victorias)
 async function sumarPuntos(i) {
   if (!isAdmin) return;
   
   jugadores[i].puntos += 3;
-  await guardarDatos(jugadores);
+  jugadores[i].victorias += 1;  // ✅ NUEVO: Sumar 1 victoria
   
-  // ✅ AGREGAR ESTO para actualizar la vista
+  await guardarDatos(jugadores);
   renderRanking();
 }
 
-// 🔹 Restar puntos (NUEVA FUNCIÓN)
+// 🔹 Restar puntos (MODIFICADA para incluir victorias)
 async function restarPuntos(i) {
   if (!isAdmin) return;
   
-  const jugadorNombre = jugadores[i].nombre;
-  jugadores[i].puntos -= 3;
-  
-  // Asegurar que no queden puntos negativos
-  if (jugadores[i].puntos < 0) {
-    jugadores[i].puntos = 0;
-  }
+  jugadores[i].puntos = Math.max(0, jugadores[i].puntos - 3);
+  jugadores[i].victorias = Math.max(0, jugadores[i].victorias - 1);  // ✅ Restar 1 victoria
   
   await guardarDatos(jugadores);
+  renderRanking();
 }
 
 
-// 🔹 Reiniciar mes
+// 🔹 Reiniciar mes (MODIFICADA)
 async function reiniciarMes() {
   if (!isAdmin) return;
   let confirmar = confirm("¿Seguro que quieres reiniciar el mes?");
   if (confirmar) {
-    jugadores.forEach(j => j.puntos = 0);
+    jugadores.forEach(j => {
+      j.puntos = 0;
+      j.victorias = 0;  // ✅ También reiniciar victorias
+    });
     await guardarDatos(jugadores);
   }
 }
@@ -105,7 +104,7 @@ function login() {
   }
 }
 
-// 🔹 Render ranking (VERSIÓN DEFINITIVA)
+// 🔹 Render ranking (MODIFICADA para mostrar victorias)
 function renderRanking() {
   if (!jugadores || jugadores.length === 0) {
     console.warn("⚠️ No hay jugadores para mostrar todavía");
@@ -120,11 +119,11 @@ function renderRanking() {
     let card = document.createElement("div");
     card.classList.add("ranking-card");
 
-    // ✅ Los botones SOLO se muestran si isAdmin = true
     card.innerHTML = `
       <span>${index + 1}</span>
       <span>${j.nombre}</span>
-      <span>${j.puntos}</span>
+      <span>${j.puntos} pts</span>
+      <span>${j.victorias} 🏆</span>
       ${isAdmin ? `
         <span class="admin-only">
           <button onclick="sumarPuntos(${index})" class="btn-sumar">+3</button>
@@ -152,6 +151,3 @@ window.reiniciarMes = reiniciarMes;
 window.login = login;
 window.mostrarLogin = mostrarLogin;
 window.cerrarLogin = cerrarLogin;
-
-
-
