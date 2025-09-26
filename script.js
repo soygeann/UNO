@@ -17,7 +17,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Datos iniciales (MODIFICADOS)
+// Datos iniciales (ACTUALIZADOS)
 const jugadoresDefault = [
   { nombre: "Jean", puntos: 0, victorias: 0 },
   { nombre: "Josué", puntos: 0, victorias: 0 },
@@ -32,11 +32,19 @@ let jugadores = [];
 let isAdmin = false;
 
 // ==========================
-// 🔹 Cargar datos en vivo
+// 🔹 Cargar datos en vivo (CORREGIDO)
 // ==========================
 onSnapshot(doc(db, "ranking", "jugadores"), (docSnap) => {
   if (docSnap.exists()) {
     jugadores = docSnap.data().lista;
+    
+    // ✅ CORREGIR: Asegurar que todos tengan el campo 'victorias'
+    jugadores.forEach(jugador => {
+      if (jugador.victorias === undefined) {
+        jugador.victorias = 0; // Inicializar si no existe
+      }
+    });
+    
     console.log("🔥 Jugadores cargados:", jugadores);
     renderRanking();
   } else {
@@ -52,37 +60,65 @@ async function guardarDatos(lista) {
   await setDoc(doc(db, "ranking", "jugadores"), { lista });
 }
 
-// 🔹 Sumar puntos (MODIFICADA para incluir victorias)
+// 🔹 Sumar puntos (CORREGIDA)
 async function sumarPuntos(i) {
   if (!isAdmin) return;
   
+  // ✅ Asegurar que los valores sean números
+  if (isNaN(jugadores[i].puntos)) jugadores[i].puntos = 0;
+  if (isNaN(jugadores[i].victorias)) jugadores[i].victorias = 0;
+  
   jugadores[i].puntos += 3;
-  jugadores[i].victorias += 1;  // ✅ NUEVO: Sumar 1 victoria
+  jugadores[i].victorias += 1;
   
   await guardarDatos(jugadores);
   renderRanking();
 }
 
-// 🔹 Restar puntos (MODIFICADA para incluir victorias)
+// 🔹 Restar puntos (CORREGIDA)
 async function restarPuntos(i) {
   if (!isAdmin) return;
   
+  // ✅ Asegurar que los valores sean números
+  if (isNaN(jugadores[i].puntos)) jugadores[i].puntos = 0;
+  if (isNaN(jugadores[i].victorias)) jugadores[i].victorias = 0;
+  
   jugadores[i].puntos = Math.max(0, jugadores[i].puntos - 3);
-  jugadores[i].victorias = Math.max(0, jugadores[i].victorias - 1);  // ✅ Restar 1 victoria
+  jugadores[i].victorias = Math.max(0, jugadores[i].victorias - 1);
   
   await guardarDatos(jugadores);
   renderRanking();
 }
 
+// 🔹 Función para corregir datos existentes (OPCIONAL)
+async function corregirDatos() {
+  jugadores.forEach(jugador => {
+    if (jugador.victorias === undefined || isNaN(jugador.victorias)) {
+      jugador.victorias = 0;
+    }
+    if (jugador.puntos === undefined || isNaN(jugador.puntos)) {
+      jugador.puntos = 0;
+    }
+  });
+  
+  await guardarDatos(jugadores);
+  renderRanking();
+  console.log('✅ Datos corregidos');
+}
 
-// 🔹 Reiniciar mes (MODIFICADA)
+// Ejecutar al cargar si es admin
+if (isAdmin) {
+  corregirDatos();
+}
+
+// 🔹 Reiniciar mes (ACTUALIZADA)
 async function reiniciarMes() {
   if (!isAdmin) return;
   let confirmar = confirm("¿Seguro que quieres reiniciar el mes?");
   if (confirmar) {
     jugadores.forEach(j => {
       j.puntos = 0;
-      j.victorias = 0;  // ✅ También reiniciar victorias
+      j.victorias = 0;  // ✅ Reiniciar victorias también
     });
     await guardarDatos(jugadores);
   }
@@ -104,7 +140,7 @@ function login() {
   }
 }
 
-// 🔹 Render ranking (MODIFICADA para mostrar victorias)
+// 🔹 Render ranking (ACTUALIZADA)
 function renderRanking() {
   if (!jugadores || jugadores.length === 0) {
     console.warn("⚠️ No hay jugadores para mostrar todavía");
@@ -144,9 +180,9 @@ function cerrarLogin() {
   document.getElementById("login-container").classList.add("hidden");
 }
 
-// 🔹 Exponer funciones al DOM (ACTUALIZADO)
+// 🔹 Exponer funciones al DOM
 window.sumarPuntos = sumarPuntos;
-window.restarPuntos = restarPuntos; // ← NUEVA
+window.restarPuntos = restarPuntos;
 window.reiniciarMes = reiniciarMes;
 window.login = login;
 window.mostrarLogin = mostrarLogin;
