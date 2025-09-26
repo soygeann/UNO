@@ -52,11 +52,15 @@ async function guardarDatos(lista) {
   await setDoc(doc(db, "ranking", "jugadores"), { lista });
 }
 
-// 🔹 Sumar puntos
+// 🔹 Sumar puntos (FUNCIÓN CORREGIDA)
 async function sumarPuntos(i) {
   if (!isAdmin) return;
+  
   jugadores[i].puntos += 3;
   await guardarDatos(jugadores);
+  
+  // ✅ AGREGAR ESTO para actualizar la vista
+  renderRanking();
 }
 
 // 🔹 Restar puntos (NUEVA FUNCIÓN)
@@ -148,5 +152,6 @@ window.reiniciarMes = reiniciarMes;
 window.login = login;
 window.mostrarLogin = mostrarLogin;
 window.cerrarLogin = cerrarLogin;
+
 
 
